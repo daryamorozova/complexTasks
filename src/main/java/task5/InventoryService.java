@@ -1,12 +1,13 @@
 package task5;
 
+
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class InventoryService {
 
-    private static Map<String, List<Product>> productsMap = new HashMap<>();
-    private static boolean isInventoryOpen = true;
+    private Map<String, List<Product>> productsMap = new HashMap<>();
+     static boolean isInventoryOpen = true;
 
     public static void setIsInventoryOpenEnabled(boolean isEnabled) {
         isInventoryOpen = isEnabled;
@@ -14,7 +15,7 @@ public class InventoryService {
 
     public void addProduct(Product product) throws NegativePriceException {
         if (!isInventoryOpen) {
-            return; // Если склад закрыт, выходим
+            return;  //  Если склад закрыт, то выходим
         }
 
         if (product.getPrice() < 0) {
@@ -33,19 +34,13 @@ public class InventoryService {
         if (products == null || products.isEmpty()) {
             throw new OutOfStockException("Товары в категории " + category + " отсутствуют");
         }
-
-        return new ArrayList<>(products); // Возвращаем копию списка товаров
+        return new ArrayList<>(products);
     }
 
     public List<Product> filterProductsByCategoryAndPrice(String category, int maxPrice) {
-        return productsMap.getOrDefault(category, Collections.emptyList()).stream()
+       return productsMap.getOrDefault(category, Collections.emptyList()).stream()
                 .filter(product -> product.getPrice() <= maxPrice)
                 .collect(Collectors.toList());
     }
 
-    public static class NegativePriceException extends Exception {
-        public NegativePriceException(String message) {
-            super(message);
-        }
-    }
 }

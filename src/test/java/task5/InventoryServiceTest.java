@@ -1,5 +1,6 @@
 package task5;
 
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -8,6 +9,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class InventoryServiceTest {
+
     private InventoryService inventoryService;
 
     @BeforeEach
@@ -17,61 +19,60 @@ public class InventoryServiceTest {
     }
 
     @Test
-    public void testAddProductWhenInventoryOpen() throws InventoryService.NegativePriceException, OutOfStockException {
-        Product product = new Product("Laptop", 1000, "Electronics");
+    public void testAddProductWhenInventoryOpen() throws NegativePriceException, OutOfStockException {
+        Product product = new Product("Ноутбук", 1000, "Электроника");
         inventoryService.addProduct(product);
 
-        List<Product> products = inventoryService.extractProducts("Electronics");
+        List<Product> products = inventoryService.extractProducts("Электроника");
         assertEquals(1, products.size());
         assertEquals(product, products.get(0));
     }
 
+
     @Test
-    public void testAddProductWhenInventoryClosed() throws InventoryService.NegativePriceException {
+    public void testAddProductWhenInventoryClosed() throws NegativePriceException, OutOfStockException {
         InventoryService.setIsInventoryOpenEnabled(false);
-        Product product = new Product("Laptop", 1000, "Electronics");
-
+        Product product = new Product("Ноутбук", 1000, "Электроника");
         inventoryService.addProduct(product);
 
-        assertThrows(OutOfStockException.class, () -> {
-            inventoryService.extractProducts("Electronics");
-        });
+        assertThrows(OutOfStockException.class, () -> inventoryService.extractProducts("Электроника"));
     }
 
     @Test
-    public void testExtractProductsWhenCategoryExists() throws OutOfStockException, InventoryService.NegativePriceException {
-        Product product = new Product("Laptop", 1000, "Electronics");
+    public void testExtractProductsWhenCategoryExists() throws NegativePriceException, OutOfStockException {
+        Product product = new Product("Ноутбук", 1000, "Электроника");
         inventoryService.addProduct(product);
 
-        List<Product> products = inventoryService.extractProducts("Electronics");
+        List<Product> products = inventoryService.extractProducts("Электроника");
         assertEquals(1, products.size());
         assertEquals(product, products.get(0));
     }
 
     @Test
-    public void testExtractProductsWhenCategoryDoesNotExist() {
-        assertThrows(OutOfStockException.class, () -> {
-            inventoryService.extractProducts("NonExistentCategory");
-        });
+    public void testExtractProductsWhenCategoryDoesNotExist(){
+        assertThrows(OutOfStockException.class, () -> inventoryService.extractProducts("Несуществующая категория"));
     }
 
     @Test
-    public void testFilterProductsByCategoryAndPrice() throws InventoryService.NegativePriceException {
-        inventoryService.addProduct(new Product("Laptop", 1000, "Electronics"));
-        inventoryService.addProduct(new Product("Phone", 500, "Electronics"));
-        inventoryService.addProduct(new Product("TV", 1500, "Electronics"));
+    public void testFilterProductsByCategoryAndPrice() throws NegativePriceException {
+        inventoryService.addProduct(new Product("Ноутбук", 1000, "Электроника"));
+        inventoryService.addProduct(new Product("Телефон", 500, "Электроника"));
+        inventoryService.addProduct(new Product("Пиджак", 1500, "Одежда"));
 
-        List<Product> filteredProducts = inventoryService.filterProductsByCategoryAndPrice("Electronics", 1000);
-        assertEquals(2, filteredProducts.size());
-        assertTrue(filteredProducts.stream().anyMatch(p -> p.getName().equals("Laptop")));
-        assertTrue(filteredProducts.stream().anyMatch(p -> p.getName().equals("Phone")));
+        List<Product> filteredProducts = inventoryService.filterProductsByCategoryAndPrice("Электроника", 500);
+        assertEquals(1, filteredProducts.size());
+        assertTrue(filteredProducts.stream().anyMatch(product -> product.getName().equals("Телефон")));
+
     }
 
     @Test
-    public void testAddProductWithNegativePrice() {
-        assertThrows(InventoryService.NegativePriceException.class, () -> {
-            inventoryService.addProduct(new Product("Faulty Product", -100, "Misc"));
+    public void testAddProductWithNegativePrice(){
+        assertThrows(NegativePriceException.class, () -> {
+            inventoryService.addProduct(new Product("Неправильный продукт", -100, "Одежда"));
         });
     }
+
+
+
 
 }

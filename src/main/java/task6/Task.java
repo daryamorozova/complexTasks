@@ -30,4 +30,14 @@ public class Task<T> {
     public LocalDate getDate() {
         return date;
     }
+
+    @Override
+    public String toString() {
+        return "Задача{" +
+                "id=" + id +
+                ", статус ='" + status + '\'' +
+                ", приоритет ='" + priority + '\'' +
+                ", дата =" + date +
+                '}';
+    }
 }

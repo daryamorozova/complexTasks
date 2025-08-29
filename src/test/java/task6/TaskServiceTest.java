@@ -1,14 +1,13 @@
 package task6;
 
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import task6.Task;
-import task6.TaskService;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TaskServiceTest {
 
@@ -41,7 +40,7 @@ public class TaskServiceTest {
     @Test
     public void testAddTaskWithExistingId() {
         taskService.addTask(task1);
-        taskService.addTask(task1); // Добавляем ту же задачу
+        taskService.addTask(task1);
         assertEquals(1, taskService.sortTasksByDate(true).size());
         System.out.println("Тест добавления задачи с существующим ID: " + taskService.sortTasksByDate(true));
     }
@@ -49,17 +48,17 @@ public class TaskServiceTest {
     @Test
     public void testRemoveTaskWithExistingId() {
         taskService.addTask(task1);
-        taskService.removeTaskById("ID1");
+        taskService.removeTask("ID1");
         assertEquals(0, taskService.sortTasksByDate(true).size());
-        System.out.println("Тест удаления задачи с существующим ID: " + taskService.sortTasksByDate(true));
+        System.out.println("Тест удаления задачи с существующим ID");
     }
 
     @Test
     public void testRemoveTaskWithNonExistingId() {
         taskService.addTask(task1);
-        taskService.removeTaskById("ID2"); // Не существующий ID
+        taskService.removeTask("ID2");
         assertEquals(1, taskService.sortTasksByDate(true).size());
-        System.out.println("Тест удаления задачи с несуществующим ID: " + taskService.sortTasksByDate(true));
+        System.out.println("Тест удаления задачи с несуществующим ID");
     }
 
     @Test
@@ -73,21 +72,11 @@ public class TaskServiceTest {
 
     @Test
     public void testFilterTasksByPriority() {
-        taskService.addTask(task4);
-        taskService.addTask(task6);
-        List<Task<String>> result = taskService.filterTasksByPriority("низкий");
-        assertEquals(1, result.size());
-        System.out.println("Тест фильтрации задач по приоритету: " + result);
-    }
-
-    @Test
-    public void testSortTasksByDateAscending() {
-        taskService.addTask(task1);
-        taskService.addTask(task2);
         taskService.addTask(task3);
-        List<Task<String>> sortedTasks = taskService.sortTasksByDate(true);
-        assertEquals(task1, sortedTasks.get(0));
-        System.out.println("Тест сортировки задач по дате по возрастанию: " + sortedTasks);
+        taskService.addTask(task4);
+        List<Task<String>> result = taskService.filterTasksByPriority("высокий");
+        assertEquals(2, result.size());
+        System.out.println("Тест фильтрации задач по приоритету: " + result);
     }
 
     @Test
@@ -95,16 +84,30 @@ public class TaskServiceTest {
         taskService.addTask(task1);
         taskService.addTask(task2);
         taskService.addTask(task3);
+
         List<Task<String>> sortedTasks = taskService.sortTasksByDate(false);
         assertEquals(task3, sortedTasks.get(0));
+
         System.out.println("Тест сортировки задач по дате по убыванию: " + sortedTasks);
+    }
+
+    @Test
+    public void testSortTasksByDateAscending() {
+        taskService.addTask(task1);
+        taskService.addTask(task2);
+        taskService.addTask(task3);
+
+        List<Task<String>> sortedTasks = taskService.sortTasksByDate(true);
+        assertEquals(task1, sortedTasks.get(0));
+
+        System.out.println("Тест сортировки задач по дате по возрастанию: " + sortedTasks);
     }
 
     @Test
     public void testConcurrentAddTasks() throws InterruptedException {
         Runnable taskAdder = () -> {
             for (int i = 0; i < 1000; i++) {
-                taskService.addTask(new Task<>("ID" + i, "New", "Medium", LocalDate.now()));
+                taskService.addTask(new Task<>("ID" + i, "В работе", "Средний", LocalDate.now()));
             }
         };
 
@@ -124,12 +127,12 @@ public class TaskServiceTest {
     @Test
     public void testConcurrentRemoveTasks() throws InterruptedException {
         for (int i = 0; i < 1000; i++) {
-            taskService.addTask(new Task<>("ID" + i, "New", "Medium", LocalDate.now()));
+            taskService.addTask(new Task<>("ID" + i, "Тестирование", "Высокий", LocalDate.now()));
         }
 
         Runnable taskRemover = () -> {
             for (int i = 0; i < 1000; i++) {
-                taskService.removeTaskById("ID" + i);
+                taskService.removeTask("ID" + i);
             }
         };
 
@@ -145,4 +148,5 @@ public class TaskServiceTest {
         assertEquals(0, taskService.sortTasksByDate(true).size());
         System.out.println("Тест потокобезопасности метода удаления задач: " + taskService.sortTasksByDate(true).size());
     }
+
 }
